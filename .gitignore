@@ -1,0 +1,14 @@
+## Ignore Visual Studio / .NET build outputs & IDE settings
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+appsettings.Development.json
+appsettings.Local.json
+coverage.json
+TestResults/
