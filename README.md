@@ -1,143 +1,248 @@
-# 🚀 Enterprise .NET 8 Web API — Clean Architecture & CQRS
+# 🏗️ Enterprise Web API — Clean Architecture & CQRS
 
-[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
-[![C# 12](https://img.shields.io/badge/C%23-12.0-239120?style=for-the-badge&logo=c-sharp)](https://docs.microsoft.com/en-us/dotnet/csharp/)
-[![EF Core](https://img.shields.io/badge/EF%20Core-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://docs.microsoft.com/en-us/ef/core/)
-[![MediatR](https://img.shields.io/badge/MediatR-CQRS-blue?style=for-the-badge)](https://github.com/jbogard/MediatR)
-[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
-[![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger)](https://swagger.io/)
+[![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/C%23-12.0-239120?style=for-the-badge&logo=c-sharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![EF Core](https://img.shields.io/badge/EF%20Core-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://docs.microsoft.com/en-us/ef/core/)
+[![SQL Server](https://img.shields.io/badge/SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server)
+[![MediatR](https://img.shields.io/badge/MediatR-12.x-blue?style=for-the-badge)](https://github.com/jbogard/MediatR)
+[![FluentValidation](https://img.shields.io/badge/FluentValidation-11.x-B71C1C?style=for-the-badge)](https://docs.fluentvalidation.net/)
+[![xUnit](https://img.shields.io/badge/xUnit-Tests-brightgreen?style=for-the-badge&logo=xunit)](https://xunit.net/)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![Swagger](https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](https://swagger.io/)
 
-A production-grade, enterprise-ready **ASP.NET Core 8 Web API** template built using **Clean Architecture** principles, **CQRS with MediatR**, **Entity Framework Core**, **FluentValidation**, and **xUnit** unit tests.
+> Designed using enterprise development practices including **Clean Architecture**, **CQRS**, **Dependency Injection**, **Structured Logging**, **Input Validation**, **Docker**, and **Unit Testing**. This project serves as a production-ready template for building scalable, maintainable, and testable ASP.NET Core applications.
 
-Designed as a showcase repository demonstrating high-performance, maintainable backend architectural patterns for enterprise software development.
+---
+
+## ✔ Features
+
+| Feature | Status |
+| :--- | :---: |
+| Clean Architecture (4-Layer) | ✅ |
+| CQRS Pattern | ✅ |
+| MediatR (Commands & Queries) | ✅ |
+| MediatR Pipeline Behaviors (Validation + Logging) | ✅ |
+| FluentValidation | ✅ |
+| Entity Framework Core 8 | ✅ |
+| SQL Server / In-Memory DB Support | ✅ |
+| Repository Pattern (via EF Core DbContext abstraction) | ✅ |
+| Global Exception Handling Middleware (RFC 7807 ProblemDetails) | ✅ |
+| Swagger / OpenAPI Documentation | ✅ |
+| Health Check Endpoint | ✅ |
+| Docker & Docker Compose | ✅ |
+| Audit Fields (CreatedAt, ModifiedAt, CreatedBy) | ✅ |
+| Paginated Queries | ✅ |
+| Unit Testing (xUnit + FluentAssertions + Moq) | ✅ |
 
 ---
 
 ## 🏛️ Architecture Overview
 
-The solution strictly enforces separation of concerns across 4 distinct layers:
+The solution strictly enforces separation of concerns across 4 distinct layers with unidirectional dependency flow:
 
 ```
-                            ┌─────────────────────────────────┐
-                            │     CleanArchitecture.WebApi    │
-                            │   (Controllers, Swagger, DI)    │
-                            └────────────────┬────────────────┘
-                                             │
-                        ┌────────────────────┴────────────────────┐
-                        ▼                                         ▼
-         ┌──────────────────────────────┐        ┌──────────────────────────────┐
-         │ CleanArchitecture.            │        │ CleanArchitecture.           │
-         │ Infrastructure               │        │ Application                  │
-         │ (EF Core, DB Context, Seeds) │        │ (CQRS, MediatR, Validation)  │
-         └──────────────┬───────────────┘        └──────────────┬───────────────┘
-                        │                                       │
-                        └────────────────────┬──────────────────┘
-                                             ▼
-                            ┌─────────────────────────────────┐
-                            │     CleanArchitecture.Domain    │
-                            │   (Entities, Value Objects)     │
-                            └─────────────────────────────────┘
+┌───────────────────────────────────────────────┐
+│           CleanArchitecture.WebApi             │
+│    Controllers │ Swagger │ Middleware │ DI     │
+└──────────────────────┬────────────────────────┘
+                       │  depends on
+        ┌──────────────┴───────────────┐
+        ▼                             ▼
+┌────────────────────┐   ┌──────────────────────────┐
+│  CleanArchitecture │   │   CleanArchitecture.     │
+│  .Infrastructure   │   │      Application         │
+│                    │   │                          │
+│  EF Core DbContext │   │  MediatR Handlers        │
+│  DB Configurations │   │  Commands & Queries      │
+│  Seed Data         │   │  FluentValidation        │
+│  SQL Server        │   │  Pipeline Behaviors      │
+└─────────┬──────────┘   └────────────┬─────────────┘
+          │                           │
+          └──────────────┬────────────┘
+                         │  both depend on
+                         ▼
+          ┌──────────────────────────────┐
+          │   CleanArchitecture.Domain   │
+          │                              │
+          │   Entities (Product, Cat.)   │
+          │   Enums (ProductStatus)      │
+          │   Base Auditable Entity      │
+          │   Zero Dependencies          │
+          └──────────────────────────────┘
 ```
 
 ### Layer Responsibilities
 
-1. **Domain Layer (`CleanArchitecture.Domain`)**: Core enterprise entities, domain events, base audit abstractions (`AuditableEntity`), and enums. Contains zero third-party framework dependencies.
-2. **Application Layer (`CleanArchitecture.Application`)**: Business logic implemented via **CQRS (Command Query Responsibility Segregation)** using **MediatR**. Includes:
-   - **Queries**: Paginated list fetching, single entity queries with DTO projections.
-   - **Commands**: Entity creation, updates, and deletion.
-   - **Validation Behaviors**: Automatic input validation pipeline via **FluentValidation** before execution.
-   - **Logging Behaviors**: Structured request execution logging.
-3. **Infrastructure Layer (`CleanArchitecture.Infrastructure`)**: Entity Framework Core persistence with DbContext configurations, audit interceptors, and automated database initialisation & seeding.
-4. **Web API Layer (`CleanArchitecture.WebApi`)**: RESTful API Controllers, Swagger UI, Health Checks, and global exception handling middleware returning RFC 7807 `ProblemDetails`.
+| Layer | Responsibility | Dependencies |
+| :--- | :--- | :--- |
+| **Domain** | Core entities, enums, base abstractions | None |
+| **Application** | Business logic, CQRS handlers, validation, DTOs | Domain |
+| **Infrastructure** | EF Core persistence, DB configs, seeding | Application, Domain |
+| **WebApi** | REST endpoints, Swagger, middleware, DI wiring | Infrastructure, Application |
+| **Tests** | Unit tests for handlers, validators, behaviors | Application, Infrastructure |
 
 ---
 
-## ✨ Key Features & Technical Highlights
+## 📑 API Endpoints
 
-* **CQRS Pattern**: Decoupled read and write data flows utilizing MediatR handlers.
-* **MediatR Pipeline Behaviors**: Cross-cutting concerns (logging, validation) execute transparently without cluttering command handlers.
-* **Standardized Exception Handling**: Global middleware converts exceptions into RFC 7807 compliant `ProblemDetails` (`400 Bad Request`, `404 Not Found`, `500 Server Error`).
-* **Zero-Config Developer Experience**: Boots automatically out of the box using **EF Core In-Memory Database** with pre-seeded sample data. Can be effortlessly switched to **SQL Server** via `appsettings.json`.
-* **Automated Unit Testing**: Includes unit tests covering MediatR handlers, validation rules, and pipeline behaviors using `xUnit`, `FluentAssertions`, and `Moq`.
-* **Containerization Ready**: Includes multi-stage `Dockerfile` and `docker-compose.yml`.
+| Method | Endpoint | Description | Response |
+| :---: | :--- | :--- | :--- |
+| `GET` | `/api/products` | Paginated list (supports `searchTerm` & `categoryId`) | `200 OK` |
+| `GET` | `/api/products/{id}` | Get product by ID | `200 OK` / `404` |
+| `POST` | `/api/products` | Create a new product | `201 Created` / `400` |
+| `PUT` | `/api/products/{id}` | Update a product | `204 NoContent` / `400` / `404` |
+| `DELETE` | `/api/products/{id}` | Delete a product | `204 NoContent` / `404` |
+| `GET` | `/api/categories` | Get all categories | `200 OK` |
+| `GET` | `/health` | Application health check | `200 OK` |
 
 ---
 
-## 📑 API Endpoints Summary
+## 📂 Solution Structure
 
-| Method | Endpoint | Description | Status Code |
-| :--- | :--- | :--- | :---: |
-| **GET** | `/api/products` | Get paginated list of products (supports `SearchTerm` & `CategoryId`) | `200 OK` |
-| **GET** | `/api/products/{id}` | Get product details by ID | `200 OK`, `404` |
-| **POST** | `/api/products` | Create a new product | `201 Created`, `400` |
-| **PUT** | `/api/products/{id}` | Update an existing product | `204 NoContent`, `400`, `404` |
-| **DELETE** | `/api/products/{id}` | Delete a product | `204 NoContent`, `404` |
-| **GET** | `/api/categories` | Get all product categories | `200 OK` |
-| **GET** | `/health` | Application health check endpoint | `200 OK` |
+```
+enterprise-webapi-clean-architecture/
+├── CleanArchitecture.sln
+├── Dockerfile
+├── docker-compose.yml
+├── src/
+│   ├── CleanArchitecture.Domain/
+│   │   ├── Common/          → BaseEntity, AuditableEntity
+│   │   ├── Entities/        → Product, Category
+│   │   └── Enums/           → ProductStatus
+│   ├── CleanArchitecture.Application/
+│   │   ├── Common/
+│   │   │   ├── Behaviors/   → ValidationBehavior, LoggingBehavior
+│   │   │   ├── Exceptions/  → ValidationException, NotFoundException
+│   │   │   ├── Interfaces/  → IApplicationDbContext
+│   │   │   └── Models/      → Result<T>, PaginatedList<T>
+│   │   └── Products/
+│   │       ├── Commands/    → Create, Update, Delete
+│   │       ├── Queries/     → GetById, GetWithPagination
+│   │       └── Dtos/        → ProductDto
+│   ├── CleanArchitecture.Infrastructure/
+│   │   ├── Persistence/
+│   │   │   ├── ApplicationDbContext.cs
+│   │   │   ├── ApplicationDbContextInitialiser.cs
+│   │   │   └── Configurations/ → ProductConfig, CategoryConfig
+│   │   └── DependencyInjection.cs
+│   └── CleanArchitecture.WebApi/
+│       ├── Controllers/     → ApiControllerBase, Products, Categories
+│       ├── Middleware/      → ExceptionHandlingMiddleware
+│       ├── Program.cs
+│       └── appsettings.json
+└── tests/
+    └── CleanArchitecture.Application.Tests/
+        ├── Products/        → CreateCommandTests, PaginationQueryTests
+        └── Common/          → ValidationBehaviorTests
+```
 
 ---
 
 ## 🛠️ How to Run Locally
 
 ### Prerequisites
-* [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-* Visual Studio 2022 / VS Code / JetBrains Rider
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- Visual Studio 2022 / VS Code / JetBrains Rider *(any one)*
 
-### Step-by-Step
+### Steps
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/dotnet-clean-architecture-api.git
-   cd dotnet-clean-architecture-api
-   ```
+**1. Clone the repository**
+```bash
+git clone https://github.com/waqarrasheed4444/enterprise-webapi-clean-architecture.git
+cd enterprise-webapi-clean-architecture
+```
 
-2. **Restore dependencies & build**:
-   ```bash
-   dotnet build
-   ```
+**2. Build the solution**
+```bash
+dotnet build
+```
 
-3. **Run unit tests**:
-   ```bash
-   dotnet test
-   ```
+**3. Run all unit tests**
+```bash
+dotnet test
+```
 
-4. **Start the API**:
-   ```bash
-   dotnet run --project src/CleanArchitecture.WebApi
-   ```
+**4. Start the API** *(uses In-Memory DB with auto-seeded sample data — no SQL Server needed!)*
+```bash
+dotnet run --project src/CleanArchitecture.WebApi
+```
 
-5. **Open Swagger UI**:
-   Navigate to `https://localhost:7124` or `http://localhost:5000` in your web browser. Swagger UI will load automatically.
+**5. Open Swagger UI**  
+Navigate to `http://localhost:5000` — Swagger UI loads automatically at the root URL.
 
 ---
 
 ## 🐳 Running with Docker
 
-You can run the entire application inside Docker without needing local .NET installation:
+No local .NET SDK required. The API runs fully inside Docker:
 
 ```bash
 docker-compose up --build
 ```
-Access Swagger UI at `http://localhost:8080`.
+
+Open `http://localhost:8080` to access the Swagger UI.
 
 ---
 
-## 🧪 Unit Testing Strategy
+## 🔌 Switching to SQL Server
 
-Unit tests are located in `tests/CleanArchitecture.Application.Tests`:
+To connect to a real SQL Server database:
+
+1. Open `src/CleanArchitecture.WebApi/appsettings.json`
+2. Change:
+   ```json
+   "UseInMemoryDatabase": false,
+   "ConnectionStrings": {
+     "DefaultConnection": "Server=YOUR_SERVER;Database=CleanArchitectureDb;Trusted_Connection=True;"
+   }
+   ```
+3. Apply EF Core migrations:
+   ```bash
+   dotnet ef database update --project src/CleanArchitecture.Infrastructure --startup-project src/CleanArchitecture.WebApi
+   ```
+
+---
+
+## 🧪 Unit Testing
 
 ```bash
 dotnet test --logger "console;verbosity=detailed"
 ```
 
-Tested scenarios include:
-- `CreateProductCommandHandlerTests`: Validates entity persistence & category non-existence checks.
-- `GetProductsWithPaginationQueryHandlerTests`: Tests pagination logic, page size limits, and entity counts.
-- `ValidationBehaviorTests`: Ensures invalid commands throw structured `ValidationException` before handler execution.
+Test results: **5 / 5 Passed ✅**
+
+| Test Class | What is Tested |
+| :--- | :--- |
+| `CreateProductCommandHandlerTests` | Product creation & category validation |
+| `GetProductsWithPaginationQueryHandlerTests` | Pagination logic and total count |
+| `ValidationBehaviorTests` | MediatR pipeline validation before handler execution |
 
 ---
 
-## 📜 License & Contact
+## ⚠️ Error Handling
 
-Designed & Maintained by **Full Stack .NET Developer**.  
-Feel free to connect on [Upwork](https://www.upwork.com) or [LinkedIn](https://www.linkedin.com).
+All exceptions return standardized RFC 7807 `application/problem+json` responses:
+
+```json
+{
+  "title": "Validation Error",
+  "status": 400,
+  "detail": "One or more validation failures have occurred.",
+  "instance": "/api/products",
+  "errors": {
+    "Name": ["Product name is required."],
+    "Price": ["Price must be greater than zero."]
+  }
+}
+```
+
+---
+
+## 📜 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+**Designed and maintained by Waqar Hussain**  
+[GitHub](https://github.com/waqarrasheed4444) • [LinkedIn](https://linkedin.com)
