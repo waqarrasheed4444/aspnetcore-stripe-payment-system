@@ -15,6 +15,13 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Order> Orders => Set<Order>();
+    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<PaymentTransaction> PaymentTransactions => Set<PaymentTransaction>();
+    public DbSet<StripeCustomer> StripeCustomers => Set<StripeCustomer>();
+    public DbSet<Subscription> Subscriptions => Set<Subscription>();
+    public DbSet<ProcessedWebhookEvent> ProcessedWebhookEvents => Set<ProcessedWebhookEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

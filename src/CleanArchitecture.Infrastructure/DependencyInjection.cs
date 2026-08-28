@@ -1,5 +1,6 @@
 using CleanArchitecture.Application.Common.Interfaces;
 using CleanArchitecture.Infrastructure.Persistence;
+using CleanArchitecture.Infrastructure.Stripe;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +28,13 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<ApplicationDbContextInitialiser>();
+
+        // Stripe Configuration
+        services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
+
+        // Stripe Services
+        services.AddScoped<IStripePaymentService, StripePaymentService>();
+        services.AddScoped<IStripeSubscriptionService, StripeSubscriptionService>();
 
         return services;
     }
